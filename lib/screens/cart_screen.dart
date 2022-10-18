@@ -3,6 +3,7 @@ import 'package:flutter/src/widgets/framework.dart';
 
 import 'package:flutter/material.dart';
 import 'package:myshopapp/providers/cart.dart' show Cart;
+import 'package:myshopapp/providers/orders.dart';
 import 'package:myshopapp/widgets/cartItem.dart';
 import 'package:provider/provider.dart';
 
@@ -33,7 +34,7 @@ class CartScreen extends StatelessWidget {
                   Spacer(),
                   Chip(
                     label: Text(
-                      '\$${cart.totalAmount}',
+                      '\$${cart.totalAmount.toStringAsFixed(2)}',
                       style: TextStyle(
                           color: Theme.of(context)
                               .primaryTextTheme
@@ -42,7 +43,13 @@ class CartScreen extends StatelessWidget {
                     ),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
-                  TextButton(onPressed: () {}, child: Text('ORDER NOW'))
+                  TextButton(
+                      onPressed: () {
+                        Provider.of<Orders>(context, listen: false).addOrder(
+                            cart.items.values.toList(), cart.totalAmount);
+                        cart.clear();
+                      },
+                      child: Text('ORDER NOW'))
                 ]),
           ),
         ),
@@ -52,13 +59,12 @@ class CartScreen extends StatelessWidget {
         Expanded(
             child: ListView.builder(
           itemCount: cart.items.length,
-          itemBuilder: (context, i) =>
-            CartItem(
-                id: cart.items.values.toList()[i].id,
-                title: cart.items.values.toList()[i].title,
-                quantity: cart.items.values.toList()[i].quantity,
-                price: cart.items.values.toList()[i].price),
-          
+          itemBuilder: (context, i) => CartItem(
+              id: cart.items.values.toList()[i].id,
+              productId: cart.items.keys.toList()[i],
+              title: cart.items.values.toList()[i].title,
+              quantity: cart.items.values.toList()[i].quantity,
+              price: cart.items.values.toList()[i].price),
         ))
       ]),
     );
