@@ -13,7 +13,7 @@ class ProductDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productId =
-        ModalRoute.of(context)?.settings.arguments as String; // is the id!
+        ModalRoute.of(context)!.settings.arguments as String; // is the id!
     final loadedProduct = Provider.of<Products>(
       context,
       listen: false,
@@ -24,31 +24,35 @@ class ProductDetailScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Column(
-          children: [
+          children: <Widget>[
             Container(
-                height: 300,
-                width: double.infinity,
-                child: Image.network(
-                  loadedProduct.imageUrl,
-                  fit: BoxFit.cover,
-                )),
-            SizedBox(
-              height: 10,
+              height: 300,
+              width: double.infinity,
+              child: Image.network(
+                loadedProduct.imageUrl,
+                fit: BoxFit.cover,
+              ),
             ),
+            SizedBox(height: 10),
             Text(
               '\$${loadedProduct.price}',
-              style: TextStyle(fontSize: 20, color: Colors.grey),
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 20,
+              ),
             ),
             SizedBox(
               height: 10,
             ),
             Container(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                width: double.infinity,
-                child: Text(
-                  loadedProduct.description,
-                  textAlign: TextAlign.center,
-                ))
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              width: double.infinity,
+              child: Text(
+                loadedProduct.description,
+                textAlign: TextAlign.center,
+                softWrap: true,
+              ),
+            )
           ],
         ),
       ),

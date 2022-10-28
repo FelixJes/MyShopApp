@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:myshopapp/providers/orders.dart' show Orders;
-import 'package:myshopapp/widgets/app_drawer.dart';
-import 'package:myshopapp/widgets/order_item.dart';
 import 'package:provider/provider.dart';
 
-class OrdersScreen extends StatelessWidget {
-  const OrdersScreen({super.key});
+import '../providers/orders.dart' show Orders;
+import '../widgets/order_item.dart';
+import '../widgets/app_drawer.dart';
 
-  static const routeName = '/Orders';
+class OrdersScreen extends StatelessWidget {
+  static const routeName = '/orders';
 
   @override
   Widget build(BuildContext context) {
     final orderData = Provider.of<Orders>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Oders'),
+        title: Text('Your Orders'),
       ),
       drawer: AppDrawer(),
       body: ListView.builder(
-        itemBuilder: (context, i) => OrderItem(order: orderData.orders[i]),
         itemCount: orderData.orders.length,
+        itemBuilder: (ctx, i) => OrderItem(orderData.orders[i]),
       ),
     );
   }

@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import '../providers/product.dart';
+import 'package:flutter/foundation.dart';
 
 class CartItem {
   final String id;
@@ -7,11 +6,12 @@ class CartItem {
   final int quantity;
   final double price;
 
-  CartItem(
-      {required this.id,
-      required this.title,
-      required this.quantity,
-      required this.price});
+  CartItem({
+    required this.id,
+    required this.title,
+    required this.quantity,
+    required this.price,
+  });
 }
 
 class Cart with ChangeNotifier {
@@ -33,23 +33,32 @@ class Cart with ChangeNotifier {
     return total;
   }
 
-  void addItem(String productId, double price, String title) {
+  void addItem(
+    String productId,
+    double price,
+    String title,
+  ) {
     if (_items.containsKey(productId)) {
+      // change quantity...
       _items.update(
-          productId,
-          (eixtingCartItem) => CartItem(
-              id: eixtingCartItem.id,
-              title: eixtingCartItem.title,
-              quantity: eixtingCartItem.quantity + 1,
-              price: eixtingCartItem.price));
+        productId,
+        (existingCartItem) => CartItem(
+              id: existingCartItem.id,
+              title: existingCartItem.title,
+              price: existingCartItem.price,
+              quantity: existingCartItem.quantity + 1,
+            ),
+      );
     } else {
       _items.putIfAbsent(
-          productId,
-          () => CartItem(
+        productId,
+        () => CartItem(
               id: DateTime.now().toString(),
               title: title,
+              price: price,
               quantity: 1,
-              price: price));
+            ),
+      );
     }
     notifyListeners();
   }
@@ -67,10 +76,11 @@ class Cart with ChangeNotifier {
       _items.update(
           productId,
           (existingCartItem) => CartItem(
-              id: existingCartItem.id,
-              title: existingCartItem.title,
-              quantity: existingCartItem.quantity,
-              price: existingCartItem.price));
+                id: existingCartItem.id,
+                title: existingCartItem.title,
+                price: existingCartItem.price,
+                quantity: existingCartItem.quantity - 1,
+              ));
     } else {
       _items.remove(productId);
     }
