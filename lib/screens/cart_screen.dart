@@ -33,13 +33,18 @@ class CartScreen extends StatelessWidget {
                     label: Text(
                       '\$${cart.totalAmount.toStringAsFixed(2)}',
                       style: TextStyle(
-                        color: Theme.of(context).primaryColor,
+                        color: Colors.white,
                       ),
                     ),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
                   TextButton(
-                    child: Text('ORDER NOW', style: TextStyle(color: Theme.of(context).primaryColor,),),
+                    child: Text(
+                      'ORDER NOW',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
                     onPressed: () {
                       Provider.of<Orders>(context, listen: false).addOrder(
                         cart.items.values.toList(),
@@ -47,7 +52,6 @@ class CartScreen extends StatelessWidget {
                       );
                       cart.clear();
                     },
-      
                   )
                 ],
               ),
@@ -58,12 +62,12 @@ class CartScreen extends StatelessWidget {
             child: ListView.builder(
               itemCount: cart.items.length,
               itemBuilder: (ctx, i) => CartItem(
-                    cart.items.values.toList()[i].id,
-                    cart.items.keys.toList()[i],
-                    cart.items.values.toList()[i].price,
-                    cart.items.values.toList()[i].quantity,
-                    cart.items.values.toList()[i].title,
-                  ),
+                cart.items.values.toList()[i].id,
+                cart.items.keys.toList()[i],
+                cart.items.values.toList()[i].price,
+                cart.items.values.toList()[i].quantity,
+                cart.items.values.toList()[i].title,
+              ),
             ),
           )
         ],
