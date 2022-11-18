@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myshopapp/providers/products.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/app_drawer.dart';
@@ -18,7 +19,24 @@ class ProductsOverviewScreen extends StatefulWidget {
 }
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+  }
+  @override
+  void didChangeDependencies() {
+    if (_Isinit) {
+      Provider.of<Products>(context).fetchAndsetProduct();
+    }
+
+    _Isinit = false;
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+  }
+
+  var _isLoading = false;
   var _showOnlyFavorites = false;
+  var _Isinit = true;
 
   @override
   Widget build(BuildContext context) {
@@ -40,21 +58,21 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
               Icons.more_vert,
             ),
             itemBuilder: (_) => [
-                  PopupMenuItem(
-                    child: Text('Only Favorites'),
-                    value: FilterOptions.Favorites,
-                  ),
-                  PopupMenuItem(
-                    child: Text('Show All'),
-                    value: FilterOptions.All,
-                  ),
-                ],
+              PopupMenuItem(
+                child: Text('Only Favorites'),
+                value: FilterOptions.Favorites,
+              ),
+              PopupMenuItem(
+                child: Text('Show All'),
+                value: FilterOptions.All,
+              ),
+            ],
           ),
           Consumer<Cart>(
             builder: (_, cart, child) => Badge(
-                  child: child!,
-                  value: cart.itemCount.toString(),
-                ),
+              child: child!,
+              value: cart.itemCount.toString(),
+            ),
             child: IconButton(
               icon: Icon(
                 Icons.shopping_cart,
