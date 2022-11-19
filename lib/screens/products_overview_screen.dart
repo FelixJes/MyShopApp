@@ -25,24 +25,32 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   }
   @override
   void didChangeDependencies() {
-    if (_Isinit) {
-      Provider.of<Products>(context).fetchAndsetProduct();
+    if (_isinit) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      Provider.of<Products>(context).fetchAndsetProduct().then((value) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
     }
 
-    _Isinit = false;
+    _isinit = false;
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
   }
 
   var _isLoading = false;
   var _showOnlyFavorites = false;
-  var _Isinit = true;
+  var _isinit = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('MyShop'),
+        title: const Text('MyShop'),
         actions: <Widget>[
           PopupMenuButton(
             onSelected: (FilterOptions selectedValue) {
@@ -54,27 +62,27 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                 }
               });
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.more_vert,
             ),
             itemBuilder: (_) => [
-              PopupMenuItem(
-                child: Text('Only Favorites'),
+              const PopupMenuItem(
                 value: FilterOptions.Favorites,
+                child: Text('Only Favorites'),
               ),
-              PopupMenuItem(
-                child: Text('Show All'),
+              const PopupMenuItem(
                 value: FilterOptions.All,
+                child: Text('Show All'),
               ),
             ],
           ),
           Consumer<Cart>(
             builder: (_, cart, child) => Badge(
-              child: child!,
               value: cart.itemCount.toString(),
+              child: child!,
             ),
             child: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.shopping_cart,
               ),
               onPressed: () {
@@ -85,7 +93,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: ProductsGrid(_showOnlyFavorites),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showOnlyFavorites),
     );
   }
 }
