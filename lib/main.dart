@@ -6,6 +6,7 @@ import 'package:myshopapp/providers/orders.dart';
 import 'package:myshopapp/screens/cart_screen.dart';
 import 'package:myshopapp/screens/edit_product_screen.dart';
 import 'package:myshopapp/screens/orders_screen.dart';
+import 'package:myshopapp/screens/products_overview_screen.dart';
 import 'package:myshopapp/screens/user_products_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -18,29 +19,38 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => Auth(),
-        ),
-        ChangeNotifierProvider(create: (context) => Products()),
-        ChangeNotifierProvider(create: (context) => Cart()),
-        ChangeNotifierProvider(create: (context) => Orders())
-      ],
-      child: MaterialApp(
-          title: 'MyShop',
-          theme: ThemeData(
-            primarySwatch: Colors.purple,
-            accentColor: Colors.deepOrange,
-            fontFamily: 'Lato',
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => Auth(),
           ),
-          home: AuthScreen(),
-          routes: {
-            ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
-            CartScreen.routeName: (ctx) => CartScreen(),
-            OrdersScreen.routeName: (context) => OrdersScreen(),
-            UserProductsScreen.routeName: (context) => UserProductsScreen(),
-            EditProductScreen.routeName: (context) => EditProductScreen(),
-          }),
-    );
+          ChangeNotifierProxyProvider<Auth, Products>(
+            update: (context, auth, previous) => Products(auth.token,
+                previous == null ? [] : previous.items, auth.userId),
+            create: (context) => Products(null, [], ''),
+          ),
+          ChangeNotifierProvider(create: (context) => Cart()),
+          ChangeNotifierProxyProvider<Auth, Orders>(
+            update: (context, auth, previous) => Orders(auth.token,
+                previous == null ? [] : previous.orders, auth.userId),
+            create: (context) => Orders(null, [], ''),
+          ),
+        ],
+        child: Consumer<Auth>(
+          builder: (context, auth, child) => MaterialApp(
+              title: 'MyShop',
+              theme: ThemeData(
+                primarySwatch: Colors.purple,
+                accentColor: Colors.deepOrange,
+                fontFamily: 'Lato',
+              ),
+              home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+              routes: {
+                ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
+                CartScreen.routeName: (ctx) => CartScreen(),
+                OrdersScreen.routeName: (context) => OrdersScreen(),
+                UserProductsScreen.routeName: (context) => UserProductsScreen(),
+                EditProductScreen.routeName: (context) => EditProductScreen(),
+              }),
+        ));
   }
 }

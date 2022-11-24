@@ -1,29 +1,89 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:myshopapp/models/htttp_expcetion.dart';
 
 class Auth extends ChangeNotifier {
   String? _token;
   DateTime? _expiryDate;
   String? _userId;
+  Timer? _authTimer;
+
+  bool get isAuth {
+    return token != null;
+  }
+
+  String? get token {
+    if (_expiryDate != null &&
+        _expiryDate!.isAfter(DateTime.now()) &&
+        _token != null) {
+      return _token;
+    }
+    return null;
+  }
+
+  String? get userId {
+    return _userId;
+  }
 
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
     final url = Uri.parse(
         'https://identitytoolkit.googleapis.com/v1/$urlSegment?key=AIzaSyCXl77hra74JEYnCNclU_t0TpPtJeUEr2M');
 
-    final response = await http.post(url,
-        body: json.encode(
-            {'email': email, 'password': password, 'returnSecureToken': true}));
-    print(json.decode(response.body));
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            'email': email,
+            'password': password,
+            'returnSecureToken': true
+          }));
+      final responseData = json.decode(response.body);
+
+      if (responseData['error'] != null) {
+        throw HttpException(responseData['error']['message']);
+      }
+      _token = responseData['idToken'];
+      _userId = responseData['localId'];
+      _expiryDate = DateTime.now()
+          .add(Duration(seconds: int.parse(responseData['expiresIn'])));
+      _autoLogOut();
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
   }
 
   Future<void> signUp(String email, String password) async {
-   return _authenticate(email, password, 'accounts:signUp');
+    return _authenticate(email, password, 'accounts:signUp');
   }
 
   Future<void> logIn(String email, String password) async {
-   return _authenticate(email, password, 'accounts:signInWithPassword');
+    return _authenticate(email, password, 'accounts:signInWithPassword');
+  }
+
+  void logout() {
+    _token = null;
+    _userId = null;
+    _expiryDate = null;
+    if (_authTimer != null) {
+      _authTimer?.cancel();
+      _authTimer = null;
+    }
+
+    notifyListeners();
+  }
+
+  void _autoLogOut() {
+    if (_authTimer != null) {
+      _authTimer?.cancel();
+    }
+    final timeToExpiry = _expiryDate!.difference(DateTime.now()).inSeconds;
+    _authTimer = Timer(
+      Duration(seconds: timeToExpiry),
+      logout,
+    );
   }
 }
