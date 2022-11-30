@@ -115,10 +115,10 @@ class _AuthCardState extends State<AuthCard>
     // TODO: implement initState
     super.initState();
     _controller =
-        AnimationController(vsync: this, duration: Duration(microseconds: 200));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
 
-    _slideAnimation =
-        Tween<Offset>(begin: Offset(0, -1.5), end: Offset(0, -1.5)).animate(
+    _slideAnimation = Tween<Offset>(begin: Offset(0, -1.5), end: Offset(0, 0))
+        .animate(
             CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
 
     _opacityAnimation = Tween(begin: 0.0, end: 1.0)
@@ -220,7 +220,7 @@ class _AuthCardState extends State<AuthCard>
       ),
       elevation: 8.0,
       child: AnimatedContainer(
-        duration: Duration(microseconds: 300),
+        duration: Duration(milliseconds: 300),
         curve: Curves.fastOutSlowIn,
         height: _authMode == AuthMode.Signup ? 320 : 260,
         // height: _heightAnimation.value.height,
